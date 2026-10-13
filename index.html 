@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ionrise – Repase baterií, měření a energetická řešení</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' fill='%23fff'/%3E%3Cg transform='translate(0 58)'%3E%3Crect x='3' y='3' width='172' height='78' rx='15' fill='none' stroke='%23000' stroke-width='8'/%3E%3Crect x='181' y='28' width='16' height='28' rx='5'/%3E%3Ctext x='89' y='56' text-anchor='middle' font-family='Arial Narrow,Arial' font-weight='700' font-size='40' textLength='140' lengthAdjust='spacingAndGlyphs'%3EIONRISE%3C/text%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=Roboto+Condensed:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{--k:#000;--w:#fff;--g:#8a8a8a;--l:#262626;--h:'Inter',system-ui,Arial,sans-serif;--b:'Inter',system-ui,Arial,sans-serif;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 70px);background:var(--k)}
+body{font-family:var(--b);background:var(--k);color:var(--w);line-height:1.65;overflow-x:hidden}
+a{color:inherit}
+.c1{max-width:1100px;margin:auto;padding:0 20px}
+.s{padding:90px 0}.d{background:var(--k);color:var(--w)}.lt{background:var(--w);color:var(--k)}
+h1,h2,h3{font-family:var(--h);line-height:1.12;letter-spacing:-.025em}
+h2{font-size:clamp(2rem,5vw,3.4rem);margin-bottom:22px;font-weight:800}
+.lead{max-width:60ch;color:var(--g);font-size:1.1rem}.lt .lead{color:#444}
+.btn{display:inline-block;padding:14px 28px;border-radius:99px;font-weight:700;text-decoration:none;border:1.5px solid var(--w);background:var(--w);color:var(--k);font-family:var(--b);font-size:1rem;cursor:pointer;transition:.3s}
+.btn:hover{background:transparent;color:var(--w)}
+.btn.o{background:transparent;color:var(--w)}.btn.o:hover{background:var(--w);color:var(--k)}
+.lt .btn{background:var(--k);color:var(--w);border-color:var(--k)}.lt .btn:hover{background:transparent;color:var(--k)}
+.btns{display:flex;gap:14px;flex-wrap:wrap;margin-top:34px}
+/* nav */
+.nav{position:fixed;top:0;left:0;right:0;z-index:50;padding-top:env(safe-area-inset-top,0px);transition:.3s}
+.nav.s2{background:rgba(0,0,0,.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--l)}
+.nav .in{display:flex;align-items:center;justify-content:space-between;max-width:1100px;margin:auto;padding:14px 20px}
+.logo{display:block;line-height:0;color:var(--w)}.logo svg{height:44px;width:auto}
+.nav ul{list-style:none;display:none;position:absolute;top:100%;left:0;right:0;background:var(--k);padding:10px 20px 20px;border-bottom:1px solid var(--l)}
+.nav.o ul{display:block}
+.nav li a{display:block;padding:12px 0;text-decoration:none;border-bottom:1px solid var(--l);font-weight:500}
+.rt{display:flex;align-items:center;gap:10px}.lang{display:flex;border:1.5px solid var(--w);border-radius:99px;overflow:hidden}.lang button{background:none;border:0;color:var(--w);font:700 .8rem var(--b);padding:6px 12px;cursor:pointer;transition:.3s}.lang button.on{background:var(--w);color:var(--k)}
+.bg{background:none;border:0;width:40px;height:40px;cursor:pointer;display:grid;place-content:center;gap:6px}
+.bg i{display:block;width:24px;height:2px;background:var(--w);transition:.3s}
+.nav.o .bg i:first-child{transform:translateY(4px) rotate(45deg)}.nav.o .bg i:last-child{transform:translateY(-4px) rotate(-45deg)}
+@media(min-width:900px){.nav ul{display:flex;position:static;padding:0;border:0;gap:24px;background:none}.nav li a{border:0;padding:6px 0;position:relative;font-size:.95rem}.nav li a:after{content:'';position:absolute;left:0;bottom:0;height:1.5px;width:0;background:var(--w);transition:.3s}.nav li a:hover:after{width:100%}.bg{display:none}}
+/* hero */
+.hero{min-height:100svh;display:flex;align-items:center;padding:130px 0 70px;overflow:hidden}
+.hero .c1{display:grid;gap:50px;align-items:center}
+@media(min-width:900px){.hero .c1{grid-template-columns:1.25fr .75fr}}
+.hero h1{font-size:clamp(2.3rem,5vw,4rem);font-weight:800;letter-spacing:-.035em}
+.ln{display:block;overflow:hidden}.ln span{display:block;animation:up 1.1s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--n)*.14s)}
+@keyframes up{from{transform:translateY(110%)}}
+.hero p{max-width:46ch;margin-top:26px;color:#bbb;font-size:1.15rem;animation:fi 1s .6s both}
+.hero .btns{animation:fi 1s .8s both}
+@keyframes fi{from{opacity:0}}
+.bat{width:100%;overflow:visible}
+.cell{fill:#fff;transform-box:fill-box;transform-origin:50% 100%;animation:rise 3.4s ease-in-out infinite;animation-delay:calc(var(--i)*.2s)}
+@keyframes rise{0%,100%{transform:scaleY(.1)}45%,72%{transform:scaleY(1)}}
+.ion{fill:#fff;animation:ion 4.2s linear infinite;animation-delay:var(--d)}
+@keyframes ion{0%{transform:translateY(0);opacity:0}15%{opacity:1}100%{transform:translateY(-250px);opacity:0}}
+/* services rows */
+.row{display:grid;gap:10px;padding:30px 20px;border-top:1px solid var(--k);text-decoration:none;transition:.35s}
+.row:last-child{border-bottom:1px solid var(--k)}
+.row h3{font-size:1.7rem;font-weight:800}.row p{color:#444;transition:.35s}
+.row:hover{background:var(--k);color:var(--w);padding-left:34px}.row:hover p{color:#bbb}
+@media(min-width:800px){.row{grid-template-columns:1fr 1.3fr;gap:40px;align-items:center}}
+/* repase */
+.two{display:grid;gap:60px}
+@media(min-width:900px){.two{grid-template-columns:1fr 1fr}}
+.feat{list-style:none;margin-top:26px}
+.feat li{padding:13px 0;border-bottom:1px solid var(--l);display:flex;gap:14px;align-items:center}
+.feat li:before{content:'';width:9px;height:9px;border-radius:50%;background:var(--w);flex:none}
+.steps{list-style:none;position:relative;counter-reset:s}
+.steps:before{content:'';position:absolute;left:21px;top:10px;bottom:10px;width:2px;background:var(--w);transform:scaleY(0);transform-origin:top;transition:transform 1.8s ease}
+.steps.v:before{transform:scaleY(1)}
+.steps li{counter-increment:s;position:relative;padding:0 0 38px 70px}
+.steps li:last-child{padding-bottom:0}
+.steps li:before{content:counter(s);position:absolute;left:0;top:0;width:44px;height:44px;border-radius:50%;background:var(--k);border:2px solid var(--w);display:grid;place-items:center;font-family:var(--h);font-weight:800}
+.steps h3{font-size:1.3rem;margin-bottom:4px}.steps p{color:var(--g)}
+.note{margin-top:30px;color:var(--g);font-size:.95rem}
+/* meters */
+.mt{margin-top:34px;display:grid;gap:22px}
+.mt div{display:grid;gap:8px;font-weight:500}
+.mt i{display:block;height:12px;border:1.5px solid var(--k);border-radius:9px;overflow:hidden}
+.mt i b{display:block;height:100%;width:0;background:var(--k);transition:width 1.6s cubic-bezier(.2,.8,.2,1)}
+.mt.v i b{width:var(--p)}
+.mt small{color:#666}
+/* stats */
+.stats{display:grid;gap:40px;text-align:center}
+@media(min-width:700px){.stats{grid-template-columns:repeat(3,1fr)}}
+.stats strong{display:block;font-family:var(--h);font-size:clamp(3.2rem,9vw,5.5rem);line-height:1;font-weight:800}
+.stats span{color:var(--g)}
+/* soon */
+.soon{display:grid;gap:20px;margin-top:40px}
+@media(min-width:800px){.soon{grid-template-columns:1fr 1fr}}
+.soon div{border:1px solid var(--k);padding:34px;border-radius:26px}
+.soon h3{font-size:1.6rem;margin:12px 0 8px}
+.tag{display:inline-flex;align-items:center;gap:8px;font-size:.9rem;font-weight:700}
+.tag:before{content:'';width:9px;height:9px;border-radius:50%;background:var(--k);animation:pl 1.6s infinite}
+@keyframes pl{50%{opacity:.15}}
+/* about */
+.hl{margin-top:44px;display:grid;gap:0}
+@media(min-width:800px){.hl{grid-template-columns:1fr 1fr}}
+.hl div{padding:26px 0;border-top:1px solid var(--l)}
+@media(min-width:800px){.hl div:nth-child(odd){padding-right:30px}.hl div:nth-child(even){padding-left:30px;border-left:1px solid var(--l)}}
+.hl h3{font-size:1.25rem;margin-bottom:6px}.hl p{color:var(--g)}
+/* contact */
+form{display:grid;gap:22px}
+label{display:grid;gap:4px;font-weight:500;font-size:.95rem}
+input,select,textarea{font:inherit;padding:10px 0;border:0;border-bottom:1.5px solid var(--k);background:transparent;color:var(--k);border-radius:0;outline:0;transition:.3s}
+input:focus,select:focus,textarea:focus{border-bottom-width:3px}
+textarea{min-height:110px;resize:vertical}
+.info p{margin-bottom:22px}.info small{display:block;color:#666}
+.info a{font-weight:700;font-size:1.15rem;text-decoration:none;border-bottom:1.5px solid}
+.info a:hover{background:var(--k);color:var(--w)}
+.info a.cl{display:flex;gap:12px;align-items:baseline;padding:15px 22px;border:1.5px solid var(--k);border-radius:99px;margin-bottom:12px;font-size:1.05rem}.info a.cl span{font-weight:400;opacity:.6;font-size:.9rem}
+.packs{display:grid;gap:20px;margin:70px 0 90px}@media(min-width:800px){.packs{grid-template-columns:1fr 1fr}}
+.pk{border:1.5px solid var(--k);border-radius:26px;padding:34px}.pk h3{font-size:1.5rem}.pk strong{display:block;font-family:var(--h);font-size:3rem;line-height:1.1;margin-top:10px;letter-spacing:-.03em}.pk small{color:#777}.pk .btn{margin-top:26px}
+.lt .feat li{border-color:#ddd}.lt .feat li:before{background:var(--k)}
+.pk.inv{background:var(--k);color:var(--w)}.pk.inv small{color:#aaa}.pk.inv .feat li{border-color:var(--l)}.pk.inv .feat li:before{background:var(--w)}.pk.inv .btn{background:var(--w);color:var(--k);border-color:var(--w)}.pk.inv .btn:hover{background:transparent;color:var(--w)}
+.sub{font-size:clamp(1.6rem,3.5vw,2.3rem);font-weight:800;margin-bottom:12px}.sub+.lead{margin-bottom:36px}.sub.m2{margin-top:90px}
+.lt .steps:before{background:var(--k)}.lt .steps li:before{background:var(--w);border-color:var(--k)}.lt .steps p{color:#555}.nt{display:block;font-size:.85rem;margin-top:6px;color:#777}
+/* footer */
+footer{padding:60px 0 40px;border-top:1px solid var(--l);color:var(--g);font-size:.95rem}
+.fg{display:grid;gap:34px;margin-bottom:40px}
+@media(min-width:800px){.fg{grid-template-columns:1.4fr 1fr 1fr 1fr}}
+footer h3{color:var(--w);font-size:1.05rem;margin-bottom:12px}
+footer ul{list-style:none}footer li{margin-bottom:8px}footer a{text-decoration:none}footer a:hover{color:var(--w)}
+:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.cell{transform:none}.ion{opacity:0}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="lg" viewBox="0 0 200 84"><rect x="3" y="3" width="172" height="78" rx="15" fill="none" stroke="currentColor" stroke-width="6"/><rect x="181" y="28" width="16" height="28" rx="5" fill="currentColor"/><text x="89" y="56" text-anchor="middle" font-family="'Roboto Condensed','Arial Narrow',Arial,sans-serif" font-weight="700" font-size="40" textLength="140" lengthAdjust="spacingAndGlyphs" fill="currentColor">IONRISE</text></symbol></svg>
+<header class="nav" id="nav">
+<div class="in">
+<a class="logo" href="#top" aria-label="Ionrise"><svg viewBox="0 0 200 84"><use href="#lg"/></svg></a>
+<ul>
+<li><a href="#repase">Repase</a></li><li><a href="#mereni">Měření</a></li><li><a href="#eshop">Eshop</a></li><li><a href="#stavby">Stavby</a></li><li><a href="#partneri">Partneři</a></li><li><a href="#o-nas">O nás</a></li><li><a href="#kontakt">Kontakty</a></li>
+</ul>
+<div class="rt"><div class="lang"><button data-l="cs">CZ</button><button data-l="en">EN</button></div><button class="bg" id="bg" aria-label="Menu"><i></i><i></i></button></div>
+</div>
+</header>
+
+<main id="top">
+<section class="hero d">
+<div class="c1">
+<div>
+<h1><span class="ln" style="--n:0"><span>Inovativní řešení</span></span><span class="ln" style="--n:1"><span>pro energetiku</span></span><span class="ln" style="--n:2"><span>budoucnosti</span></span></h1>
+<p>Specializujeme se na repase baterií, měření jejich stavu, stavby a úpravy elektrických vozidel.</p>
+<div class="btns"><a class="btn" href="#sluzby">Naše služby</a><a class="btn o" href="#eshop">Nakupovat v eshopu</a></div>
+</div>
+<svg class="bat" viewBox="0 0 640 260" role="img" aria-label="Animovaná baterie, jejíž články se nabíjejí">
+<rect x="4" y="40" width="580" height="180" rx="34" fill="none" stroke="#fff" stroke-width="4"/>
+<rect x="596" y="100" width="36" height="60" rx="10" fill="#fff"/>
+<rect class="cell" style="--i:0" x="34" y="64" width="50" height="132" rx="12"/><rect class="cell" style="--i:1" x="100" y="64" width="50" height="132" rx="12"/><rect class="cell" style="--i:2" x="166" y="64" width="50" height="132" rx="12"/><rect class="cell" style="--i:3" x="232" y="64" width="50" height="132" rx="12"/><rect class="cell" style="--i:4" x="298" y="64" width="50" height="132" rx="12"/><rect class="cell" style="--i:5" x="364" y="64" width="50" height="132" rx="12"/><rect class="cell" style="--i:6" x="430" y="64" width="50" height="132" rx="12"/><rect class="cell" style="--i:7" x="496" y="64" width="50" height="132" rx="12"/>
+<circle class="ion" style="--d:0s" cx="60" cy="250" r="4"/><circle class="ion" style="--d:1.2s" cx="170" cy="250" r="3"/><circle class="ion" style="--d:2.4s" cx="280" cy="250" r="4"/><circle class="ion" style="--d:.6s" cx="390" cy="250" r="3"/><circle class="ion" style="--d:1.8s" cx="500" cy="250" r="4"/><circle class="ion" style="--d:3s" cx="560" cy="250" r="3"/>
+</svg>
+</div>
+</section>
+
+<section class="s lt" id="sluzby">
+<div class="c1">
+<h2>Co pro vás uděláme</h2>
+<p class="lead" style="margin-bottom:44px">Komplexní řešení šitá na míru vašim potřebám.</p>
+<a class="row" href="#repase"><h3>Repase baterií</h3><p>Repase všech typů lithiových baterií s prvotřídními články. Zvýšíme kapacitu a prodloužíme životnost přechodem na novější články a ochrannou elektroniku BMS.</p></a>
+<a class="row" href="#mereni"><h3>Měření a diagnostika</h3><p>Změříme kapacitu, vnitřní odpor, napětí a celkový zdravotní stav vašich baterií.</p></a>
+<a class="row" href="#stavby"><h3>Zakázkové stavby</h3><p>Energetická řešení pro domácnosti i firmy a úpravy elektrických vozidel.</p></a>
+<a class="row" href="#o-nas"><h3>Servis elektrokol</h3><p>Kompletní servis a údržba elektrokol včetně oprav motorů a elektroniky.</p></a>
+</div>
+</section>
+
+<section class="s d" id="repase">
+<div class="c1 two">
+<div>
+<h2>Repase baterií</h2>
+<p class="lead">Od powerbank po velké packy pro elektrokola, elektromobily a průmysl. Prodloužíme životnost vaší baterie.</p>
+<ul class="feat"><li>24měsíční záruka na práci a články</li><li>Pouze kvalitní články předních výrobců</li><li>Rychlé dodací lhůty</li><li>Bezplatná diagnostika při repasi</li></ul>
+<p class="note">Ceny jsou orientační. Pro přesnou kalkulaci nám pošlete informace o baterii.</p>
+<div class="btns"><a class="btn" href="#kontakt">Poslat informace o baterii</a><a class="btn o" href="cenik.pdf" target="_blank" rel="noopener">Ceník repasí (PDF)</a></div>
+</div>
+<ol class="steps io">
+<li><h3>Diagnostika</h3><p>Změříme stav baterie a zjistíme, jestli se repase vyplatí.</p></li>
+<li><h3>Kalkulace</h3><p>Dostanete orientační cenu podle typu a kapacity baterie.</p></li>
+<li><h3>Repase</h3><p>Vyměníme články a ochrannou elektroniku BMS.</p></li>
+<li><h3>Záruka</h3><p>Na práci i články dostanete 24 měsíců záruky.</p></li>
+</ol>
+</div>
+</section>
+
+<section class="s lt" id="mereni">
+<div class="c1">
+<div class="two">
+<div>
+<h2>Měření a diagnostika</h2>
+<p class="lead">Přesná diagnostika stavu baterií pomocí moderních měřicích přístrojů a profesionálních metod. Je prvním krokem k rozhodnutí, jestli zvolit repasi, nebo jen opravu.</p>
+<div class="btns"><a class="btn" href="#kontakt" data-s="mereni">Objednat měření</a></div>
+</div>
+<div>
+<div class="mt io">
+<div>Kapacita<i><b style="--p:82%"></b></i></div>
+<div>Vnitřní odpor<i><b style="--p:46%"></b></i></div>
+<div>Napětí<i><b style="--p:68%"></b></i></div>
+<div>Zdravotní stav<i><b style="--p:74%"></b></i></div>
+<small>Ilustrace měřených veličin</small>
+</div>
+</div>
+</div>
+<div class="packs">
+<div class="pk"><h3>Základní měření</h3><strong>390 Kč</strong><small>vč. DPH</small><ul class="feat"><li>Přesné měření kapacity a výkonu</li><li>Analýza stavu BMS (Battery Management System)</li><li>Zhodnocení celkového zdravotního stavu baterie</li><li>Doporučení dalšího postupu – repase nebo oprava</li></ul><a class="btn" href="#kontakt" data-s="mereni">Objednat měření</a></div>
+<div class="pk inv"><h3>Kompletní měření</h3><strong>650 Kč</strong><small>vč. DPH</small><ul class="feat"><li>Přesné měření kapacity a výkonu</li><li>Stanovení vnitřního odporu článků</li><li>Analýza stavu BMS (Battery Management System)</li><li>Zhodnocení celkového zdravotního stavu baterie</li><li>Písemný report s výsledky měření</li><li>Doporučení dalšího postupu – repase nebo oprava</li></ul><a class="btn" href="#kontakt" data-s="mereni">Objednat měření</a></div>
+</div>
+<h3 class="sub">Jak probíhá měření</h3>
+<p class="lead">Profesionální proces diagnostiky od počáteční kontroly po finální doporučení.</p>
+<ol class="steps io"><li><h3>Vstupní diagnostika</h3><p>Základní kontrola vzhledu, napětí a stavu baterie. Zjištění základních parametrů a identifikace možných problémů.</p></li><li><h3>Testování pod zátěží</h3><p>Měření výkonu baterie při různých úrovních zatížení. Zjištění skutečné kapacity a výkonu v reálných podmínkách.</p></li><li><h3>Analýza článků</h3><p>Detailní test jednotlivých článků baterie. Identifikace slabých nebo poškozených článků ovlivňujících celkový výkon.</p><span class="nt">* pouze v kompletním měření</span></li><li><h3>Zhodnocení a doporučení</h3><p>Sdělení informace o celkovém stavu a doporučení dalšího postupu.</p></li><li><h3>Závěrečná zpráva</h3><p>Kompletní report s výsledky měření a grafickými výstupy.</p><span class="nt">* pouze v kompletním měření</span></li></ol>
+<h3 class="sub m2">Naše vybavení</h3>
+<p class="lead">Používáme špičkové měřicí přístroje pro přesné výsledky.</p>
+<div class="hl"><div><h3>Profesionální analyzátory</h3><p>Přesné měření kapacity, vnitřního odporu a výkonu baterií</p></div><div><h3>Zátěžové testy</h3><p>Simulace reálného provozu pro přesné určení skutečného výkonu</p></div><div><h3>Termokamera</h3><p>Detekce přehřívání článků a identifikace problémových míst</p></div><div><h3>Software pro analýzu</h3><p>Pokročilá analýza dat a generování detailních reportů</p></div></div>
+</div>
+</section>
+
+<section class="s d">
+<div class="c1 stats">
+<div><strong><b class="io" data-to="10">0</b>+</strong><span>let zkušeností</span></div>
+<div><strong><b class="io" data-to="24">0</b></strong><span>měsíců záruky</span></div>
+<div><strong>stovky</strong><span>spokojených zákazníků</span></div>
+</div>
+</section>
+
+<section class="s lt" id="eshop">
+<div class="c1">
+<h2>Ionrise Eshop</h2>
+<p class="lead">Kvalitní baterie, komponenty a příslušenství pro vaše projekty. Rádi vám poradíme s výběrem.</p>
+<div class="btns"><a class="btn" href="eshop.html">Otevřít eshop</a></div>
+<div class="soon" id="stavby">
+<div><span class="tag">Připravuje se</span><h3>Energetické stavby</h3><p>Kompletní energetická řešení pro domácnosti i firmy. Zatím nás kontaktujte pro individuální nabídku.</p></div>
+<div id="partneri"><span class="tag">Připravuje se</span><h3>Partneři</h3><p>Spolupráce s cykloservisy a výrobci elektrických vozidel. Napište nám o nabídce spolupráce.</p></div>
+</div>
+</div>
+</section>
+
+<section class="s d" id="o-nas">
+<div class="c1">
+<h2>Jsme značka Ionrise</h2>
+<p class="lead">Vlastněná firmou beigl based s.r.o. Jsme specialisté na repase baterií, servis elektrokol a energetiku. Stovkám zákazníků jsme pomohli prodloužit životnost baterií a elektrokol, ušetřit a chránit životní prostředí. Používáme jen kvalitní články od výrobců, se kterými máme vlastní zkušenost.</p>
+<div class="hl">
+<div><h3>10+ let zkušeností</h3><p>Více než desetiletí praxe v repasi baterií a energetických řešeních.</p></div>
+<div><h3>Specializace na repase</h3><p>Všechny typy lithiových baterií s kvalitními články.</p></div>
+<div><h3>Servis elektrokol</h3><p>Údržba a opravy motorů i elektroniky.</p></div>
+<div><h3>24 měsíců záruka</h3><p>Na veškerou naši práci.</p></div>
+</div>
+</div>
+</section>
+
+<section class="s lt" id="kontakt">
+<div class="c1 two">
+<div>
+<h2>Kontaktujte nás</h2>
+<p class="lead" style="margin-bottom:30px">Máte dotaz ke službám nebo produktům? Napište nám, odborná konzultace je zdarma.</p>
+<form action="https://formspree.io/f/xbldproq" method="POST">
+<label>Jméno a příjmení *<input type="text" name="name" required></label>
+<label>E-mail *<input type="email" name="email" required></label>
+<label>Telefon<input type="tel" name="phone"></label>
+<label>Předmět zprávy<select name="subject"><option value="repase">Repase baterií</option><option value="mereni">Měření článků</option><option value="stavby">Stavba na míru</option><option value="dotaz">Obecný dotaz</option><option value="reklamace">Reklamace</option></select></label>
+<label>Zpráva *<textarea name="message" required></textarea></label>
+<div><button class="btn" type="submit">Odeslat zprávu</button></div>
+</form>
+</div>
+<div class="info">
+<p><small>Sídlo společnosti</small>Bílov 137, 743 01 Bílov</p>
+<a class="cl" href="mailto:info@ionrise.one" target="_blank" rel="noopener"><span>Napsat</span>info@ionrise.one</a>
+<a class="cl" href="tel:+420608906907" target="_blank" rel="noopener"><span>Zavolat</span>+420 608 906 907</a>
+<p><small>Firma</small>beigl based s.r.o.<br>IČ: 23271299 · DIČ: CZ23271299</p>
+<p><a href="https://maps.google.com/?q=Bílov 137, 743 01 Bílov" target="_blank" rel="noopener">Naše lokace</a></p>
+</div>
+</div>
+</section>
+</main>
+
+<footer class="d">
+<div class="c1">
+<div class="fg">
+<div><svg viewBox="0 0 200 84" style="height:44px;width:auto;color:#fff;margin-bottom:14px" role="img" aria-label="Ionrise"><use href="#lg"/></svg><p>Značka vlastněná společností beigl based s.r.o.<br>10 let zkušeností v repasi baterií a servisu elektrokol.</p></div>
+<div><h3>Kontakt</h3><ul><li><a href="mailto:info@ionrise.one" target="_blank" rel="noopener">info@ionrise.one</a></li><li><a href="tel:+420608906907" target="_blank" rel="noopener">+420 608 906 907</a></li><li>Bílov 137, 743 01 Bílov</li></ul></div>
+<div><h3>Služby</h3><ul><li><a href="#eshop">Eshop</a></li><li><a href="#repase">Repase baterií</a></li><li><a href="#mereni">Měření a diagnostika</a></li><li><a href="#stavby">Zakázkové stavby</a></li></ul></div>
+<div><h3>O nás</h3><ul><li><a href="gdpr.pdf">GDPR</a></li><li><a href="podminky.pdf">Obchodní podmínky</a></li><li><a href="reklam.pdf">Reklamační řád</a></li></ul></div>
+</div>
+<p>© <span id="y"></span> Ionrise (beigl based s.r.o.). Všechna práva vyhrazena.</p>
+</div>
+</footer>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],nav=$('#nav');
+$('#bg').onclick=()=>nav.classList.toggle('o');
+$$('#nav a').forEach(a=>a.onclick=()=>nav.classList.remove('o'));
+const sc=()=>nav.classList.toggle('s2',scrollY>30);addEventListener('scroll',sc);sc();
+function count(el){const to=+el.dataset.to;let s=null;const f=t=>{s=s||t;const p=Math.min((t-s)/1400,1);el.textContent=Math.round(to*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(f)};requestAnimationFrame(f)}
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;e.target.classList.add('v');if(e.target.dataset.to)count(e.target);io.unobserve(e.target)}),{threshold:.3});
+$$('.io').forEach(e=>io.observe(e));
+$('#y').textContent=new Date().getFullYear();
+const T=[["Repase","Refurbishment"],["Měření","Testing"],["Eshop","Shop"],["Stavby","Builds"],["Partneři","Partners"],["O nás","About us"],["Kontakty","Contact"],
+["Inovativní řešení","Innovative solutions"],["pro energetiku","for the energy"],["budoucnosti","of the future"],
+["Specializujeme se na repase baterií, měření jejich stavu, stavby a úpravy elektrických vozidel.","We specialise in battery refurbishment, battery testing, custom builds and electric vehicle conversions."],
+["Naše služby","Our services"],["Nakupovat v eshopu","Shop online"],["Co pro vás uděláme","What we do for you"],["Komplexní řešení šitá na míru vašim potřebám.","Complete solutions tailored to your needs."],
+["Repase baterií","Battery refurbishment"],["Repase všech typů lithiových baterií s prvotřídními články. Zvýšíme kapacitu a prodloužíme životnost přechodem na novější články a ochrannou elektroniku BMS.","Refurbishment of all types of lithium batteries with top-quality cells. We raise capacity and extend lifespan by moving to newer cells and BMS protection electronics."],
+["Měření a diagnostika","Testing & diagnostics"],["Změříme kapacitu, vnitřní odpor, napětí a celkový zdravotní stav vašich baterií.","We measure the capacity, internal resistance, voltage and overall health of your batteries."],
+["Zakázkové stavby","Custom builds"],["Energetická řešení pro domácnosti i firmy a úpravy elektrických vozidel.","Energy solutions for homes and businesses, and electric vehicle conversions."],
+["Servis elektrokol","E-bike service"],["Kompletní servis a údržba elektrokol včetně oprav motorů a elektroniky.","Full e-bike service and maintenance, including motor and electronics repairs."],
+["Od powerbank po velké packy pro elektrokola, elektromobily a průmysl. Prodloužíme životnost vaší baterie.","From power banks to large packs for e-bikes, electric cars and industry. We extend the life of your battery."],
+["24měsíční záruka na práci a články","24-month warranty on work and cells"],["Pouze kvalitní články předních výrobců","Only quality cells from leading manufacturers"],["Rychlé dodací lhůty","Fast turnaround"],["Bezplatná diagnostika při repasi","Free diagnostics with every refurbishment"],
+["Ceny jsou orientační. Pro přesnou kalkulaci nám pošlete informace o baterii.","Prices are approximate. Send us details about your battery for an exact quote."],
+["Poslat informace o baterii","Send battery details"],["Ceník repasí (PDF)","Price list (PDF)"],
+["Diagnostika","Diagnostics"],["Změříme stav baterie a zjistíme, jestli se repase vyplatí.","We measure the battery's condition and check whether refurbishment pays off."],
+["Kalkulace","Quote"],["Dostanete orientační cenu podle typu a kapacity baterie.","You get an approximate price based on battery type and capacity."],
+["Vyměníme články a ochrannou elektroniku BMS.","We replace the cells and the BMS protection electronics."],["Záruka","Warranty"],["Na práci i články dostanete 24 měsíců záruky.","Work and cells are covered by a 24-month warranty."],
+["Přesná diagnostika stavu baterií pomocí moderních měřicích přístrojů a profesionálních metod. Je prvním krokem k rozhodnutí, jestli zvolit repasi, nebo jen opravu.","Precise battery diagnostics using modern measuring instruments and professional methods. It is the first step in deciding between full refurbishment and a simple repair."],
+["Objednat měření","Order a test"],["Kapacita","Capacity"],["Vnitřní odpor","Internal resistance"],["Napětí","Voltage"],["Zdravotní stav","State of health"],["Ilustrace měřených veličin","Illustration of measured values"],["Základní měření","Basic test"],["390 Kč","CZK 390"],["vč. DPH","incl. VAT"],["Kompletní měření","Full test"],["650 Kč","CZK 650"],["Přesné měření kapacity a výkonu","Precise measurement of capacity and power"],["Analýza stavu BMS (Battery Management System)","BMS (Battery Management System) analysis"],["Zhodnocení celkového zdravotního stavu baterie","Assessment of the battery's overall health"],["Doporučení dalšího postupu – repase nebo oprava","Recommended next step: refurbishment or repair"],["Stanovení vnitřního odporu článků","Internal resistance of each cell"],["Písemný report s výsledky měření","Written report with the measurement results"],["Jak probíhá měření","How a test works"],["Profesionální proces diagnostiky od počáteční kontroly po finální doporučení.","A professional diagnostic process from the initial check to the final recommendation."],["Vstupní diagnostika","Initial diagnostics"],["Základní kontrola vzhledu, napětí a stavu baterie. Zjištění základních parametrů a identifikace možných problémů.","Basic check of the battery's appearance, voltage and condition. We record the key parameters and spot possible problems."],["Testování pod zátěží","Load testing"],["Měření výkonu baterie při různých úrovních zatížení. Zjištění skutečné kapacity a výkonu v reálných podmínkách.","We measure battery performance at different load levels to find the real capacity and output under real-world conditions."],["Analýza článků","Cell analysis"],["Detailní test jednotlivých článků baterie. Identifikace slabých nebo poškozených článků ovlivňujících celkový výkon.","A detailed test of each individual cell, identifying weak or damaged cells that drag down overall performance."],["Zhodnocení a doporučení","Assessment and recommendation"],["Sdělení informace o celkovém stavu a doporučení dalšího postupu.","We tell you the battery's overall condition and recommend what to do next."],["Závěrečná zpráva","Final report"],["Kompletní report s výsledky měření a grafickými výstupy.","A complete report with the results and graphs."],["* pouze v kompletním měření","* full test only"],["Naše vybavení","Our equipment"],["Používáme špičkové měřicí přístroje pro přesné výsledky.","We use top-class measuring instruments for accurate results."],["Profesionální analyzátory","Professional analysers"],["Přesné měření kapacity, vnitřního odporu a výkonu baterií","Accurate measurement of battery capacity, internal resistance and output"],["Zátěžové testy","Load tests"],["Simulace reálného provozu pro přesné určení skutečného výkonu","Real-world operation simulated to determine true performance"],["Termokamera","Thermal camera"],["Detekce přehřívání článků a identifikace problémových míst","Detection of overheating cells and problem spots"],["Software pro analýzu","Analysis software"],["Pokročilá analýza dat a generování detailních reportů","Advanced data analysis and detailed report generation"],
+["let zkušeností","years of experience"],["měsíců záruky","months of warranty"],["stovky","hundreds"],["spokojených zákazníků","satisfied customers"],
+["Ionrise Eshop","Ionrise Shop"],["Kvalitní baterie, komponenty a příslušenství pro vaše projekty. Rádi vám poradíme s výběrem.","Quality batteries, components and accessories for your projects. We're happy to help you choose."],["Otevřít eshop","Open the shop"],
+["Připravuje se","Coming soon"],["Energetické stavby","Energy builds"],["Kompletní energetická řešení pro domácnosti i firmy. Zatím nás kontaktujte pro individuální nabídku.","Complete energy solutions for homes and businesses. For now, contact us for an individual quote."],
+["Spolupráce s cykloservisy a výrobci elektrických vozidel. Napište nám o nabídce spolupráce.","Cooperation with bike workshops and electric vehicle manufacturers. Write to us about working together."],
+["Jsme značka Ionrise","We are Ionrise"],["Vlastněná firmou beigl based s.r.o. Jsme specialisté na repase baterií, servis elektrokol a energetiku. Stovkám zákazníků jsme pomohli prodloužit životnost baterií a elektrokol, ušetřit a chránit životní prostředí. Používáme jen kvalitní články od výrobců, se kterými máme vlastní zkušenost.","Owned by beigl based s.r.o., we specialise in battery refurbishment, e-bike service and energy solutions. We have helped hundreds of customers extend the life of their batteries and e-bikes, save money and protect the environment. We only use quality cells from manufacturers we have first-hand experience with."],
+["10+ let zkušeností","10+ years of experience"],["Více než desetiletí praxe v repasi baterií a energetických řešeních.","More than a decade of practice in battery refurbishment and energy solutions."],["Specializace na repase","Refurbishment specialists"],["Všechny typy lithiových baterií s kvalitními články.","All types of lithium batteries with quality cells."],["Údržba a opravy motorů i elektroniky.","Maintenance and repair of motors and electronics."],["24 měsíců záruka","24-month warranty"],["Na veškerou naši práci.","On all of our work."],
+["Kontaktujte nás","Contact us"],["Máte dotaz ke službám nebo produktům? Napište nám, odborná konzultace je zdarma.","Have a question about our services or products? Write to us – expert consultation is free."],
+["Jméno a příjmení *","Full name *"],["Telefon","Phone"],["Předmět zprávy","Subject"],["Zpráva *","Message *"],["Měření článků","Cell testing"],["Stavba na míru","Custom build"],["Obecný dotaz","General enquiry"],["Reklamace","Complaint"],["Odeslat zprávu","Send message"],
+["Sídlo společnosti","Company address"],["Napsat","Write"],["Zavolat","Call"],["Firma","Company"],["IČ: 23271299 · DIČ: CZ23271299","Company ID: 23271299 · VAT ID: CZ23271299"],["Naše lokace","Our location"],
+["Značka vlastněná společností beigl based s.r.o.","Brand owned by beigl based s.r.o."],["10 let zkušeností v repasi baterií a servisu elektrokol.","10 years of experience in battery refurbishment and e-bike service."],["Kontakt","Contact"],["Služby","Services"],["Obchodní podmínky","Terms and conditions"],["Reklamační řád","Complaints policy"],["Ionrise (beigl based s.r.o.). Všechna práva vyhrazena.","Ionrise (beigl based s.r.o.). All rights reserved."]];
+const M=new Map(T),N=[],tw=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT),T0=document.title;
+while(tw.nextNode()){const n=tw.currentNode,k=n.nodeValue.replace(/\s+/g,' ').trim();if(n.parentNode.tagName!='SCRIPT'&&M.has(k))N.push([n,n.nodeValue,k])}
+function setLang(l){const en=l=='en';N.forEach(([n,o,k])=>{n.nodeValue=en?o.match(/^\s*/)[0]+M.get(k)+o.match(/\s*$/)[0]:o});
+document.documentElement.lang=l;document.title=en?'Ionrise – Battery refurbishment, testing and energy solutions':T0;
+$('.bat').setAttribute('aria-label',en?'Animated battery with charging cells':'Animovaná baterie, jejíž články se nabíjejí');
+$$('.lang button').forEach(b=>b.classList.toggle('on',b.dataset.l==l));try{localStorage.setItem('lang',l)}catch(e){}}
+$$('.lang button').forEach(b=>b.onclick=()=>setLang(b.dataset.l));
+let sl='cs';try{sl=localStorage.getItem('lang')||'cs'}catch(e){}
+$$('[data-s]').forEach(a=>a.addEventListener('click',()=>{$('select[name=subject]').value=a.dataset.s}));
+setLang(sl);
+
+</script>
+</body>
+</html>
